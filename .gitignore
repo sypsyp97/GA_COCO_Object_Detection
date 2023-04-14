@@ -1,10 +1,21 @@
 # Byte-compiled / optimized / DLL files
+checkpoints
+results
+models
+cityscapes
+chest_xray_new
+.idea
 __pycache__/
 *.py[cod]
 *$py.class
 
 # C extensions
+
 *.so
+*.tflite
+*.pkl
+*.zip
+*.h5
 
 # Distribution / packaging
 .Python
@@ -127,3 +138,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+
+
