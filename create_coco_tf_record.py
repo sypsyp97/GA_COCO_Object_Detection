@@ -18,7 +18,7 @@ keypoint detection, and DensePose.
 Please note that this tool creates sharded output files.
 Example usage:
     python create_coco_tf_record.py --logtostderr \
-      --train_image_dir="${TRAIN_IMAGE_DIR}" \
+      --train_image_dir="/home/yipeng/val2017" \
       --val_image_dir="${VAL_IMAGE_DIR}" \
       --test_image_dir="${TEST_IMAGE_DIR}" \
       --train_annotations_file="${TRAIN_ANNOTATIONS_FILE}" \
