@@ -36,7 +36,7 @@ The function returns a NumPy array representing the initial population of models
 """
 
 
-def create_first_population(population, num_classes=34):
+def create_first_population(population, num_classes=4):
     first_population_array = np.random.randint(0, 2, (population, 9, 18))
 
     result_dir = f'arrays'
@@ -58,28 +58,6 @@ def create_first_population(population, num_classes=34):
         del model
 
     return first_population_array
-
-
-# def create_individual(model_array, num_classes=34):
-#     model = create_model(model_array, num_classes=num_classes)
-#     while model_has_problem(model):
-#         del model
-#         model_array = np.random.randint(0, 2, (9, 18))
-#         model = create_model(model_array, num_classes=num_classes)
-#
-#     gc.collect()
-#     del model
-#
-#     return model_array
-#
-#
-# def create_first_population(population, num_classes=34):
-#     first_population_array = np.random.randint(0, 2, (population, 9, 18))
-#
-#     with Pool(processes=8) as pool:
-#         results = pool.starmap(create_individual, [(first_population_array[i], num_classes) for i in range(population)])
-#
-#     return np.array(results)
 
 
 """Function Signature:
@@ -131,7 +109,7 @@ def select_models(train_ds,
                   epochs=30,
                   num_classes=34):
     fitness_list = []
-    tflite_accuracy_list = []
+
     tpu_time_list = []
     iou_list = []
 
@@ -139,7 +117,7 @@ def select_models(train_ds,
     generation_dir = result_dir + f'/generation_{generation}'
     best_models_arrays_dir = generation_dir + '/best_model_arrays.pkl'
     fitness_list_dir = generation_dir + '/fitness_list.pkl'
-    tflite_accuracy_list_dir = generation_dir + '/tflite_accuracy_list.pkl'
+
     iou_list_dir = generation_dir + '/iou_list.pkl'
     tpu_time_list_dir = generation_dir + '/tpu_time_list.pkl'
 
@@ -151,7 +129,7 @@ def select_models(train_ds,
     for i in range(population_array.shape[0]):
         model = create_model(population_array[i], num_classes=num_classes)
         model, history = train_model(train_ds, val_ds, model=model, epochs=epochs)
-        _, tflite_accuracy, iou = model.evaluate(test_ds)
+        iou = model.evaluate(test_ds)
         try:
             tflite_model, tflite_name = convert_to_tflite(keras_model=model, generation=generation, i=i, time=time)
             edgetpu_name = compile_edgetpu(tflite_name)
@@ -159,17 +137,15 @@ def select_models(train_ds,
         except:
             tpu_time = 9999
 
-        fitness = calculate_fitness(tflite_accuracy, iou, tpu_time)
+        fitness = calculate_fitness(iou, tpu_time)
 
-        tflite_accuracy_list.append(tflite_accuracy)
+
         iou_list.append(iou)
         fitness_list.append(fitness)
         tpu_time_list.append(tpu_time)
 
         with open(fitness_list_dir, 'wb') as f:
             pickle.dump(fitness_list, f)
-        with open(tflite_accuracy_list_dir, 'wb') as f:
-            pickle.dump(tflite_accuracy_list, f)
         with open(iou_list_dir, 'wb') as f:
             pickle.dump(iou_list, f)
         with open(tpu_time_list_dir, 'wb') as f:
@@ -255,7 +231,7 @@ generates a new binary array if it is invalid.
 The function returns a NumPy array representing the binary arrays of the individuals in the next population."""
 
 
-def create_next_population(parent_arrays, population=10, num_classes=34):
+def create_next_population(parent_arrays, population=10, num_classes=4):
     next_population_array = np.random.randint(0, 2, (population, 9, 18))
 
     for individual in range(population):

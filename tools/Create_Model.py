@@ -25,38 +25,7 @@ the output. It then applies a global average pooling layer and a dropout layer w
 it adds a dense layer with num_classes number of units and returns the model.'''
 
 
-def get_spatial_dimensions(layer):
-    output_shape = layer.output_shape
-    if isinstance(output_shape, list):
-        output_shape = output_shape[0]  # Use the first item in the list
-
-    if len(output_shape) == 4:  # Check if the layer has spatial dimensions
-        return output_shape[1:3]  # Return only the spatial
-
-    return None  # Return None if no spatial dimensions
-
-
-def find_layers_with_downsampling(model):
-    layers_with_downsampling = []
-
-    for i in range(len(model.layers) - 1):
-        current_layer = model.layers[i]
-        next_layer = model.layers[i + 1]
-
-        current_shape = get_spatial_dimensions(current_layer)
-        next_shape = get_spatial_dimensions(next_layer)
-
-        if current_shape is None or next_shape is None:  # Skip layers without spatial dimensions
-            continue
-
-        if current_shape[0] > next_shape[0] and current_shape[1] > next_shape[1]:
-            if "rescaling" not in current_layer.name:
-                layers_with_downsampling.append(current_layer)
-
-    return layers_with_downsampling
-
-
-def create_base_model(model_array, input_shape=(160, 160, 3)):
+def create_model(model_array, input_shape=(256, 256, 3), num_classes=4):
     inputs = layers.Input(shape=input_shape)
     x = layers.Rescaling(scale=1.0 / 255)(inputs)
     x = conv_block(x, kernel_size=2, filters=64, strides=2)
@@ -64,44 +33,51 @@ def create_base_model(model_array, input_shape=(160, 160, 3)):
     for i in range(9):
         x = decoded_block(x, model_array[i])
 
-    model = keras.Model(inputs, x)
+    x = conv_block(x, filters=320, kernel_size=1, strides=1)
+
+    x = layers.GlobalAvgPool2D()(x)
+    bounding_box = layers.Dense(num_classes)(x)
+
+    model = keras.Model(inputs, bounding_box)
 
     return model
 
 
-def create_model(model_array, input_shape=(160, 160, 3), num_classes=34):
-    base_model = create_base_model(model_array, input_shape)
+class MeanIoU(tf.keras.metrics.Metric):
+    def __init__(self, name="mean_iou", **kwargs):
+        super(MeanIoU, self).__init__(name=name, **kwargs)
+        self.intersection = self.add_weight(name="intersection", initializer="zeros")
+        self.union = self.add_weight(name="union", initializer="zeros")
 
-    # Find the layers with downsampling in the base model
-    downsampling_layers = find_layers_with_downsampling(base_model)
+    def update_state(self, y_true, y_pred, sample_weight=None):
+        y_true = tf.cast(y_true, tf.float32)
+        y_pred = tf.cast(y_pred, tf.float32)
 
-    # Get output of the downsampling layers for skip connections
-    skip_outputs = [layer.output for layer in downsampling_layers]
+        # Get the intersection coordinates of the bounding boxes
+        top_left = tf.maximum(y_true[:, :2], y_pred[:, :2])
+        bottom_right = tf.minimum(y_true[:, 2:], y_pred[:, 2:])
 
-    # Encoder
-    encoder_output = base_model.output
+        # Compute the intersection area
+        intersection_dims = tf.maximum(bottom_right - top_left, 0)
+        intersection_area = intersection_dims[:, 0] * intersection_dims[:, 1]
 
-    # Decoder
-    x = encoder_output
-    for i in range(len(skip_outputs) - 1, -1, -1):
-        skip_output = skip_outputs[i]
-        x = tf.keras.layers.UpSampling2D(size=2, interpolation='bilinear')(x)
-        x = tf.keras.layers.Conv2D(skip_output.shape[-1], kernel_size=3, padding='same', activation=tf.nn.relu)(x)
-        x = tf.image.resize(x, skip_output.shape[1:3])
-        x = tf.keras.layers.Concatenate()([x, skip_output])
-        x = tf.keras.layers.Conv2D(filters=skip_output.shape[-1], kernel_size=3, padding='same', activation=tf.nn.relu)(
-            x)
+        # Compute the area of the ground truth and predicted bounding boxes
+        y_true_area = (y_true[:, 2] - y_true[:, 0]) * (y_true[:, 3] - y_true[:, 1])
+        y_pred_area = (y_pred[:, 2] - y_pred[:, 0]) * (y_pred[:, 3] - y_pred[:, 1])
 
-    # Final upsampling layer and output
-    x = tf.keras.layers.UpSampling2D(size=2, interpolation='bilinear')(x)
-    x = tf.keras.layers.Conv2D(filters=num_classes, kernel_size=3, padding='same', activation=tf.nn.relu)(x)
-    output = tf.keras.layers.Conv2D(num_classes, kernel_size=1, activation=tf.nn.softmax)(x)
-    output = tf.image.resize(output, base_model.input.shape[1:3])
+        # Compute the union area
+        union_area = y_true_area + y_pred_area - intersection_area
 
-    # Create and compile the U-Net model
-    unet = tf.keras.Model(inputs=base_model.input, outputs=output)
+        # Update the intersection and union sums
+        self.intersection.assign_add(tf.reduce_sum(intersection_area))
+        self.union.assign_add(tf.reduce_sum(union_area))
 
-    return unet
+    def result(self):
+        return self.intersection / (self.union + tf.keras.backend.epsilon())
+
+    def reset_state(self):
+        self.intersection.assign(0)
+        self.union.assign(0)
 
 
 def model_summary(model):
@@ -110,10 +86,10 @@ def model_summary(model):
 
 
 def train_model(train_ds, val_ds,
-                model, epochs=30,
+                model, epochs=100,
                 checkpoint_filepath="checkpoints/checkpoint"):
     checkpoint_callback = keras.callbacks.ModelCheckpoint(checkpoint_filepath,
-                                                          monitor="val_accuracy",
+                                                          monitor="val_mean_iou",
                                                           save_best_only=True,
                                                           save_weights_only=True)
 
@@ -123,7 +99,7 @@ def train_model(train_ds, val_ds,
     opt = tfa.optimizers.MovingAverage(opt)
     opt = tfa.optimizers.Lookahead(opt)
 
-    metrics = ["accuracy", tf.keras.metrics.MeanIoU(num_classes=34, name='mean_io_u')]
+    metrics=[MeanIoU()]
 
     model.compile(optimizer=opt,
                   loss=loss_fn,

@@ -4,9 +4,9 @@ from tqdm.notebook import tqdm
 
 
 def model_evaluation(trained_model, test_ds):
-    _, raw_model_accuracy, iou = trained_model.evaluate(test_ds)
+    _, iou = trained_model.evaluate(test_ds)
 
-    return raw_model_accuracy, iou
+    return iou
 
 
 def evaluate_tflite_model(tflite_model, x_test, y_test, tfl_int8=True):
