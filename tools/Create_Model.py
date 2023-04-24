@@ -93,7 +93,7 @@ def train_model(train_ds, val_ds,
                                                           save_best_only=True,
                                                           save_weights_only=True)
 
-    loss_fn = keras.losses.CategoricalCrossentropy()
+    loss_fn = keras.losses.MeanSquaredError()
 
     opt = tfa.optimizers.LazyAdam(learning_rate=0.004)
     opt = tfa.optimizers.MovingAverage(opt)
