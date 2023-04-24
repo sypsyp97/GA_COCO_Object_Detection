@@ -64,11 +64,17 @@ for i in range(0, len(annot_paths)):
     np.asarray(images[: int(len(images) * 0.8)]),
     np.asarray(targets[: int(len(targets) * 0.8)]),
 )
+
 (x_test), (y_test) = (
-    np.asarray(images[int(len(images) * 0.8) :]),
-    np.asarray(targets[int(len(targets) * 0.8) :]),
+    np.asarray(images[int(len(images) * 0.9) :]),
+    np.asarray(targets[int(len(targets) * 0.9) :]),
+)
+
+(x_val), (y_val) = (
+    np.asarray(images[int(len(images) * 0.8) : int(len(images) * 0.9)]),
+    np.asarray(targets[int(len(targets) * 0.8) : int(len(images) * 0.9)]),
 )
 
 train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(32).prefetch(tf.data.AUTOTUNE)
-val_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32).prefetch(tf.data.AUTOTUNE)
-test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32)
+val_ds = tf.data.Dataset.from_tensor_slices((x_val, y_val)).batch(32).prefetch(tf.data.AUTOTUNE)
+test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32).prefetch(tf.data.AUTOTUNE)
