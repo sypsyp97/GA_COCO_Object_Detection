@@ -43,9 +43,9 @@ def create_model(model_array, input_shape=(256, 256, 3), num_classes=4):
     return model
 
 
-class MeanIoU(tf.keras.metrics.Metric):
-    def __init__(self, name="mean_iou", **kwargs):
-        super(MeanIoU, self).__init__(name=name, **kwargs)
+class meaniou(tf.keras.metrics.Metric):
+    def __init__(self, name="meaniou", **kwargs):
+        super(meaniou, self).__init__(name=name, **kwargs)
         self.intersection = self.add_weight(name="intersection", initializer="zeros")
         self.union = self.add_weight(name="union", initializer="zeros")
 
@@ -89,7 +89,7 @@ def train_model(train_ds, val_ds,
                 model, epochs=100,
                 checkpoint_filepath="checkpoints/checkpoint"):
     checkpoint_callback = keras.callbacks.ModelCheckpoint(checkpoint_filepath,
-                                                          monitor="val_mean_iou",
+                                                          monitor="val_meaniou",
                                                           save_best_only=True,
                                                           save_weights_only=True)
 
@@ -99,7 +99,7 @@ def train_model(train_ds, val_ds,
     opt = tfa.optimizers.MovingAverage(opt)
     opt = tfa.optimizers.Lookahead(opt)
 
-    metrics=[MeanIoU()]
+    metrics=[meaniou()]
 
     model.compile(optimizer=opt,
                   loss=loss_fn,

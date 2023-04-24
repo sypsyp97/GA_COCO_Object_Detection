@@ -128,7 +128,7 @@ def select_models(train_ds,
 
     for i in range(population_array.shape[0]):
         model = create_model(population_array[i], num_classes=num_classes)
-        model, history = train_model(train_ds, val_ds, model=model, epochs=epochs)
+        model, _ = train_model(train_ds, val_ds, model=model, epochs=epochs)
         _, iou = model.evaluate(test_ds)
         try:
             tflite_model, tflite_name = convert_to_tflite(keras_model=model, generation=generation, i=i, time=time)
