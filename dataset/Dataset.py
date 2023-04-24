@@ -60,8 +60,8 @@ for i in range(0, len(annot_paths)):
 )
 
 (x_val), (y_val) = (
-    np.asarray(images[int(len(images) * 0.8) : int(len(images) * 0.9)]),
-    np.asarray(targets[int(len(targets) * 0.8) : int(len(images) * 0.9)]),
+    np.asarray(images[int(len(images) * 0.8) :]),
+    np.asarray(targets[int(len(targets) * 0.8) :]),
 )
 
 train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(32).prefetch(tf.data.AUTOTUNE)
