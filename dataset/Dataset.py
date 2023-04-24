@@ -13,12 +13,8 @@ path_annot = "Annotations/Airplanes_Side_2/"
 
 
 # list of paths to images and annotations
-image_paths = [
-    f for f in os.listdir(path_images) if os.path.isfile(os.path.join(path_images, f))
-]
-annot_paths = [
-    f for f in os.listdir(path_annot) if os.path.isfile(os.path.join(path_annot, f))
-]
+image_paths = [f for f in os.listdir(path_images) if os.path.isfile(os.path.join(path_images, f))]
+annot_paths = [f for f in os.listdir(path_annot) if os.path.isfile(os.path.join(path_annot, f))]
 
 image_paths.sort()
 annot_paths.sort()
@@ -35,17 +31,12 @@ for i in range(0, len(annot_paths)):
     top_left_x, top_left_y = annot[2], annot[0]
     bottom_right_x, bottom_right_y = annot[3], annot[1]
 
-    image = keras.utils.load_img(
-        path_images + image_paths[i],
-    )
+    image = keras.utils.load_img(path_images + image_paths[i])
+
     (w, h) = image.size[:2]
 
-    # resize train set images
-    # if i < int(len(annot_paths) * 0.8):
-        # resize image if it is for training dataset
     image = image.resize((image_size, image_size))
 
-    # convert image to array and append to list
     images.append(keras.utils.img_to_array(image))
 
     # apply relative scaling to bounding boxes as per given image and append to list
