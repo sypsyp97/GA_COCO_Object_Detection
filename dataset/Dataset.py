@@ -71,4 +71,4 @@ for i in range(0, len(annot_paths)):
 
 train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(32).prefetch(tf.data.AUTOTUNE)
 val_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32).prefetch(tf.data.AUTOTUNE)
-test_ds = val_ds
+test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test))
