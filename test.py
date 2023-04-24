@@ -15,10 +15,10 @@ random.seed(1234)
 tf.random.set_seed(1234)
 np.random.seed(1234)
 
-#
-# with open('results_10042023182244/next_population_array.pkl', 'rb') as f:
-#     data = pickle.load(f)
-#     f.close()
+
+with open('arrays/first_population_array.pkl', 'rb') as f:
+    data = pickle.load(f)
+    f.close()
 
 
 if __name__ == '__main__':
@@ -32,9 +32,9 @@ if __name__ == '__main__':
         train_ds=train_ds,
         val_ds=val_ds,
         test_ds=test_ds,
-        generations=19,
+        generations=20,
         population=20,
-        num_classes=34,
-        epochs=40,
-        # population_array=data,
+        num_classes=4,
+        epochs=100,
+        population_array=data,
         time=formatted_date)
