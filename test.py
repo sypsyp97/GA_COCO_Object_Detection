@@ -35,6 +35,6 @@ if __name__ == '__main__':
         generations=20,
         population=20,
         num_classes=4,
-        epochs=50,
+        epochs=10,
         population_array=data,
         time=formatted_date)
