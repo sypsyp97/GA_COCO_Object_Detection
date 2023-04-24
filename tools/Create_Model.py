@@ -109,7 +109,8 @@ def train_model(train_ds, val_ds,
         history = model.fit(train_ds,
                             epochs=epochs,
                             validation_data=val_ds,
-                            callbacks=[checkpoint_callback])
+                            callbacks=[checkpoint_callback,
+                                       keras.callbacks.EarlyStopping(monitor="val_loss", patience=20)])
 
         model.load_weights(checkpoint_filepath)
     except Exception as e:
