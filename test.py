@@ -16,7 +16,7 @@ tf.random.set_seed(1234)
 np.random.seed(1234)
 
 
-with open('arrays/first_population_array.pkl', 'rb') as f:
+with open('results_24042023215229/generation_5/best_model_arrays.pkl', 'rb') as f:
     data = pickle.load(f)
     f.close()
 
@@ -32,7 +32,7 @@ if __name__ == '__main__':
         train_ds=train_ds,
         val_ds=val_ds,
         test_ds=test_ds,
-        generations=20,
+        generations=15,
         population=20,
         num_classes=4,
         epochs=50,
