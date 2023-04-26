@@ -16,7 +16,7 @@ tf.random.set_seed(1234)
 np.random.seed(1234)
 
 
-with open('results_24042023215229/next_population_array.pkl', 'rb') as f:
+with open('results_25042023190939/next_population_array.pkl', 'rb') as f:
     data = pickle.load(f)
     f.close()
 
