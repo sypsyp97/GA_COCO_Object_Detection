@@ -32,7 +32,7 @@ if __name__ == '__main__':
         train_ds=train_ds,
         val_ds=val_ds,
         test_ds=test_ds,
-        generations=15,
+        generations=5,
         population=20,
         num_classes=4,
         epochs=70,
