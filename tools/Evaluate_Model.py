@@ -4,12 +4,47 @@ from tqdm.notebook import tqdm
 
 
 def model_evaluation(trained_model, test_ds):
+    """
+    This function evaluates the performance of the trained model on the test dataset.
+
+    Parameters:
+    ----------
+    trained_model : keras.Model
+        The trained Keras model.
+    test_ds : tensorflow.data.Dataset
+        The test dataset.
+
+    Returns:
+    -------
+    iou : float
+        Intersection-over-union (IoU) of the model on the test dataset.
+    """
     _, iou = trained_model.evaluate(test_ds)
 
     return iou
 
 
 def evaluate_tflite_model(tflite_model, x_test, y_test, tfl_int8=True):
+    """
+    This function evaluates the performance of a TensorFlow Lite model on a test set.
+
+    Parameters:
+    ----------
+    tflite_model : tflite.Interpreter
+        The TensorFlow Lite model to be evaluated.
+    x_test : numpy.ndarray
+        The input data for testing.
+    y_test : numpy.ndarray
+        The true labels for the test data.
+    tfl_int8 : bool, optional
+        A flag to indicate if the input data is quantized to int8. If True, the input data is scaled and offset
+        to match the input quantization parameters of the model. Defaults to True.
+
+    Returns:
+    -------
+    float
+        The accuracy of the TensorFlow Lite model on the test data.
+    """
     interpreter = tf.lite.Interpreter(model_content=tflite_model)
     interpreter.allocate_tensors()
     input_details = interpreter.get_input_details()

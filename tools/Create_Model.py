@@ -6,26 +6,26 @@ import tensorflow as tf
 from src.Decode_Block import decoded_block
 from src.Gene_Pool import conv_block
 
-# if tf.config.list_physical_devices('GPU'):
-#     strategy = tf.distribute.MirroredStrategy()
-# else:  # Use the Default Strategy
-#     strategy = tf.distribute.get_strategy()
-
-'''This function takes in 3 inputs, model_array, num_classes and input_shape. The function creates a keras model by defining the layers in it.
-
-It starts by creating an input layer with the shape specified by the input_shape variable. Then it applies a 
-rescaling layer with a scale factor of 1/255 to the input. It then applies a convolutional block with a kernel size 
-of 2, 16 filters and a stride of 2 to the input.
-
-It then enters a for loop that iterates 9 times. On each iteration, it applies a decoded_block function to the 
-current output, passing in the current element of the model_array.
-
-After the for loop, it applies another convolutional block with 320 filters, a kernel size of 1 and a stride of 1 to 
-the output. It then applies a global average pooling layer and a dropout layer with a rate of 0.5. Finally, 
-it adds a dense layer with num_classes number of units and returns the model.'''
 
 
 def create_model(model_array, input_shape=(256, 256, 3), num_classes=4):
+    """
+    This function constructs a Keras model based on a given array encoding the structure of the model.
+
+    Parameters:
+    ----------
+    model_array : list
+        A list of integers representing the structure of the model.
+    input_shape : tuple, optional
+        The shape of the input tensor. Defaults to (256, 256, 3).
+    num_classes : int, optional
+        The number of classes for the classification task. Defaults to 4.
+
+    Returns:
+    -------
+    model : keras.Model
+        A compiled Keras model.
+    """
     inputs = layers.Input(shape=input_shape)
     x = layers.Rescaling(scale=1.0 / 255)(inputs)
     x = conv_block(x, kernel_size=2, filters=64, strides=2)
@@ -44,6 +44,16 @@ def create_model(model_array, input_shape=(256, 256, 3), num_classes=4):
 
 
 class meaniou(tf.keras.metrics.Metric):
+    """
+    This class is an implementation of a custom metric called mean intersection-over-union (mean IoU).
+
+    Intersection-over-union (IoU) is a common evaluation metric for object detection tasks. This class calculates
+    mean IoU for batch of predictions and ground truth bounding boxes.
+
+    The metric is updated using `update_state` method, and `result` method computes mean IoU. `reset_states` resets
+    the internal variables for the next computation.
+
+    """
     def __init__(self, name="meaniou", **kwargs):
         super(meaniou, self).__init__(name=name, **kwargs)
         self.intersection = self.add_weight(name="intersection", initializer="zeros")
@@ -81,6 +91,18 @@ class meaniou(tf.keras.metrics.Metric):
 
 
 def model_summary(model):
+    """
+    This function prints the summary of the Keras model along with the total number of trainable weights.
+
+    Parameters:
+    ----------
+    model : keras.Model
+        The model for which the summary is to be printed.
+
+    Returns:
+    -------
+    None
+    """
     model.summary()
     print('Number of trainable weights = {}'.format(len(model.trainable_weights)))
 
@@ -88,6 +110,31 @@ def model_summary(model):
 def train_model(train_ds, val_ds,
                 model, epochs=100,
                 checkpoint_filepath="checkpoints/checkpoint"):
+    """
+    This function trains the Keras model on the given datasets and saves the weights of the best performing model
+    using the validation dataset.
+
+    Parameters:
+    ----------
+    train_ds : tensorflow.data.Dataset
+        The training dataset.
+    val_ds : tensorflow.data.Dataset
+        The validation dataset.
+    model : keras.Model
+        The Keras model to train.
+    epochs : int, optional
+        The number of epochs to train the model. Defaults to 100.
+    checkpoint_filepath : str, optional
+        The file path to save the model weights. Defaults to "checkpoints/checkpoint".
+
+    Returns:
+    -------
+    model : keras.Model
+        The trained Keras model.
+    history : History
+        A History object. Its `history` attribute is a record of training loss values and metrics values at
+        successive epochs, as well as validation loss values and validation metrics values.
+    """
     checkpoint_callback = keras.callbacks.ModelCheckpoint(checkpoint_filepath,
                                                           monitor="val_meaniou",
                                                           save_best_only=True,
