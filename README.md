@@ -1,10 +1,10 @@
-# Genetic_NAS
+# GA_Object_Detection
 
 This repository hosts the source code for Yipeng Sun's Master's Thesis project on Genetic Neural Architecture Search (NAS). The project investigates the use of genetic algorithms in creating adaptable models for Edge TPU.
 
 ## Overview
 
-The project's objective is to explore the potential of genetic algorithms for creating models for image classification tasks that are adaptable for the Edge TPU. These models aim to leverage the capabilities of the Edge TPU to enhance inference speed while maintaining a high level of accuracy.
+The project's objective is to explore the potential of genetic algorithms for creating models for object detection tasks that are adaptable for the Edge TPU. These models aim to leverage the capabilities of the Edge TPU to enhance inference speed while maintaining a high level of IoU.
 
 ## Environment
 
@@ -27,9 +27,8 @@ The repository is structured as follows:
 - `src/`: This directory contains the main source code for the project.
 - `get_datasets/`: This directory includes scripts for data acquisition.
 - `tools/`: This directory holds utility scripts that aid in various tasks throughout the project.
-- `test.ipynb`: A Jupyter notebook used for testing and generating figures for the master thesis.
-- `test.jpg`: An image file that is used for testing the inference on Edge TPU.
-- `tf_flower_test.py`: A Python script that is used for testing the application with the TensorFlow Flowers dataset.
+- `figures.ipynb`: A Jupyter notebook used for generating figures for the master thesis.
+- `test.py`: A Python script that is used for testing the application with the Caltech101 dataset.
 - `requirements.txt`: Specifies the libraries and their respective versions required for this project.
 
 
