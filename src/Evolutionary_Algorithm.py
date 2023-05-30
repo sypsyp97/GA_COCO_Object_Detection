@@ -1,14 +1,12 @@
 import gc
 
 import numpy as np
-from multiprocessing import Pool
-from tools.Create_Model import create_model
-from tools.Evaluate_Model import evaluate_tflite_model, model_evaluation
-from tools.Create_Model import train_model
-from tools.Model_Checker import model_has_problem
-from tools.TFLITE_Converter import convert_to_tflite
-from tools.Compile_Edge_TPU import compile_edgetpu
-from tools.Inference_Speed_TPU import inference_time_tpu
+from src.Create_Model import create_model
+from src.Create_Model import train_model
+from src.Model_Checker import model_has_problem
+from src.TFLITE_Converter import convert_to_tflite
+from src.Compile_Edge_TPU import compile_edgetpu
+from src.Inference_Speed_TPU import inference_time_tpu
 from src.Fitness_Function import calculate_fitness
 import pickle
 import os

@@ -1,5 +1,5 @@
-from tools.TFLITE_Converter import convert_to_tflite
-from tools.Compile_Edge_TPU import compile_edgetpu
+from src.TFLITE_Converter import convert_to_tflite
+from src.Compile_Edge_TPU import compile_edgetpu
 
 import os
 

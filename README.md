@@ -24,9 +24,8 @@ pip install -r requirements.txt
 
 The repository is structured as follows:
 
-- `src/`: This directory contains the main source code for the project.
+- `src/`: This directory contains the main source code and utility scripts that aid in various tasks for the project.
 - `get_datasets/`: This directory includes scripts for data acquisition.
-- `tools/`: This directory holds utility scripts that aid in various tasks throughout the project.
 - `figures.ipynb`: A Jupyter notebook used for generating figures for the master thesis.
 - `test.py`: A Python script that is used for testing the application with the Caltech101 dataset.
 - `requirements.txt`: Specifies the libraries and their respective versions required for this project.
