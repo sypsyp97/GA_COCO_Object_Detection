@@ -52,6 +52,10 @@ population_array, max_fitness_history, average_fitness_history, best_models_arra
     )
 ```
 
+## Additional Note
+
+For detailed documentation of functions, please refer to our [Genetic_NAS project](https://github.com/sypsyp97/Genetic_NAS.git).
+
 ## License
 
 This project is licensed under the terms of the MIT license. For more details, see the `LICENSE` file.
