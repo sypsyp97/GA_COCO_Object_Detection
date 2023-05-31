@@ -26,8 +26,7 @@ The repository is structured as follows:
 
 - `src/`: This directory contains the main source code and utility scripts that aid in various tasks for the project.
 - `get_datasets/`: This directory includes scripts for data acquisition.
-- `figures.ipynb`: A Jupyter notebook used for generating figures for the master thesis.
-- `test.py`: A Python script that is used for testing the application with the Caltech101 dataset.
+- `example.py`: A Python script that is used for testing the application with the Caltech101 dataset.
 - `requirements.txt`: Specifies the libraries and their respective versions required for this project.
 
 
@@ -49,6 +48,11 @@ population_array, max_fitness_history, average_fitness_history, best_models_arra
         epochs=30,
         time=formatted_date
     )
+```
+
+You can also easily start the NAS process by running the `example.py` script. This script has been designed to make running the NAS process simpler by predefining certain parameters and steps.
+```bash
+python example.py
 ```
 
 ## Additional Note
