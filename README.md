@@ -30,12 +30,12 @@ This project is developed in Python 3.9 environment with TensorFlow 2.11 being t
 git clone https://github.com/sypsyp97/Genetic_NAS.git
 cd Genetic_NAS
 ```
-2. Set up a virtual environment and install the required packages using `pip`:
-
+2. Set up a [Miniconda](https://docs.conda.io/en/latest/miniconda.html) environment and install the required packages:
 ```bash
-python3 -m venv env
-source env/bin/activate
+conda create -n env python=3.9
+conda activate env
 pip install -r requirements.txt
+
 ```
 
 ## Repository Structure
