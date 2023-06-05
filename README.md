@@ -1,7 +1,7 @@
 # GA_Object_Detection
 
-![GitHub Code License](https://img.shields.io/github/license/sypsyp97/Genetic_NAS)
-![GitHub last commit](https://img.shields.io/github/last-commit/sypsyp97/Genetic_NAS)
+![GitHub Code License](https://img.shields.io/github/license/sypsyp97/GA_Object_Detection)
+![GitHub last commit](https://img.shields.io/github/last-commit/sypsyp97/GA_Object_Detection)
 ![GitHub pull request](https://img.shields.io/badge/PRs-not_welcome-red)
 
 
