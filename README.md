@@ -80,7 +80,7 @@ For detailed documentation of functions, please refer to our [Genetic_NAS projec
 
 ## License
 
-This project is licensed under the terms of the [MIT License](LICENSE). 
+This project is licensed under the terms of the [Apache-2.0 License](LICENSE). 
 
 ## Citation
 
