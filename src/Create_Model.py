@@ -1,11 +1,10 @@
-from keras import layers
-import tensorflow_addons as tfa
-from tensorflow import keras
 import tensorflow as tf
+import tensorflow_addons as tfa
+from keras import layers
+from tensorflow import keras
 
 from src.Decode_Block import decoded_block
 from src.Gene_Pool import conv_block
-
 
 
 def create_model(model_array, input_shape=(256, 256, 3), num_classes=4):
@@ -54,6 +53,7 @@ class meaniou(tf.keras.metrics.Metric):
     the internal variables for the next computation.
 
     """
+
     def __init__(self, name="meaniou", **kwargs):
         super(meaniou, self).__init__(name=name, **kwargs)
         self.intersection = self.add_weight(name="intersection", initializer="zeros")
@@ -104,12 +104,12 @@ def model_summary(model):
     None
     """
     model.summary()
-    print('Number of trainable weights = {}'.format(len(model.trainable_weights)))
+    print("Number of trainable weights = {}".format(len(model.trainable_weights)))
 
 
-def train_model(train_ds, val_ds,
-                model, epochs=100,
-                checkpoint_filepath="checkpoints/checkpoint"):
+def train_model(
+    train_ds, val_ds, model, epochs=100, checkpoint_filepath="checkpoints/checkpoint"
+):
     """
     This function trains the Keras model on the given datasets and saves the weights of the best performing model
     using the validation dataset.
@@ -135,10 +135,12 @@ def train_model(train_ds, val_ds,
         A History object. Its `history` attribute is a record of training loss values and metrics values at
         successive epochs, as well as validation loss values and validation metrics values.
     """
-    checkpoint_callback = keras.callbacks.ModelCheckpoint(checkpoint_filepath,
-                                                          monitor="val_meaniou",
-                                                          save_best_only=True,
-                                                          save_weights_only=True)
+    checkpoint_callback = keras.callbacks.ModelCheckpoint(
+        checkpoint_filepath,
+        monitor="val_meaniou",
+        save_best_only=True,
+        save_weights_only=True,
+    )
 
     loss_fn = keras.losses.MeanSquaredError()
 
@@ -146,18 +148,20 @@ def train_model(train_ds, val_ds,
     opt = tfa.optimizers.MovingAverage(opt)
     opt = tfa.optimizers.Lookahead(opt)
 
-    metrics=[meaniou()]
+    metrics = [meaniou()]
 
-    model.compile(optimizer=opt,
-                  loss=loss_fn,
-                  metrics=metrics)
+    model.compile(optimizer=opt, loss=loss_fn, metrics=metrics)
 
     try:
-        history = model.fit(train_ds,
-                            epochs=epochs,
-                            validation_data=val_ds,
-                            callbacks=[checkpoint_callback,
-                                       keras.callbacks.EarlyStopping(monitor="val_loss", patience=20)])
+        history = model.fit(
+            train_ds,
+            epochs=epochs,
+            validation_data=val_ds,
+            callbacks=[
+                checkpoint_callback,
+                keras.callbacks.EarlyStopping(monitor="val_loss", patience=20),
+            ],
+        )
 
         model.load_weights(checkpoint_filepath)
     except Exception as e:

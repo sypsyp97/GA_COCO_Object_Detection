@@ -1,15 +1,15 @@
 import gc
+import os
+import pickle
 
 import numpy as np
-from src.Create_Model import create_model
-from src.Create_Model import train_model
+
+from src.Compile_Edge_TPU import compile_edgetpu
+from src.Create_Model import create_model, train_model
+from src.Fitness_Function import calculate_fitness
+from src.Inference_Speed_TPU import inference_time_tpu
 from src.Model_Checker import model_has_problem
 from src.TFLITE_Converter import convert_to_tflite
-from src.Compile_Edge_TPU import compile_edgetpu
-from src.Inference_Speed_TPU import inference_time_tpu
-from src.Fitness_Function import calculate_fitness
-import pickle
-import os
 
 
 def create_first_population(population, num_classes=5):
@@ -49,14 +49,16 @@ def create_first_population(population, num_classes=5):
     return first_population_array
 
 
-def select_models(train_ds,
-                  val_ds,
-                  test_ds,
-                  time,
-                  population_array,
-                  generation,
-                  epochs=30,
-                  num_classes=34):
+def select_models(
+    train_ds,
+    val_ds,
+    test_ds,
+    time,
+    population_array,
+    generation,
+    epochs=30,
+    num_classes=34,
+):
     """
     Trains models defined by the population_array, evaluates them, selects the best models based on fitness
     and saves the model information and fitness stats.
@@ -104,12 +106,12 @@ def select_models(train_ds,
     iou_list = []
 
     # Define directories for saving results
-    result_dir = f'results_{time}'
-    generation_dir = result_dir + f'/generation_{generation}'
-    best_models_arrays_dir = generation_dir + '/best_model_arrays.pkl'
-    fitness_list_dir = generation_dir + '/fitness_list.pkl'
-    iou_list_dir = generation_dir + '/iou_list.pkl'
-    tpu_time_list_dir = generation_dir + '/tpu_time_list.pkl'
+    result_dir = f"results_{time}"
+    generation_dir = result_dir + f"/generation_{generation}"
+    best_models_arrays_dir = generation_dir + "/best_model_arrays.pkl"
+    fitness_list_dir = generation_dir + "/fitness_list.pkl"
+    iou_list_dir = generation_dir + "/iou_list.pkl"
+    tpu_time_list_dir = generation_dir + "/tpu_time_list.pkl"
 
     # Create directories if they don't exist
     if not os.path.exists(result_dir):
@@ -123,11 +125,13 @@ def select_models(train_ds,
         model = create_model(population_array[i], num_classes=num_classes)
         model, history = train_model(train_ds, val_ds, model=model, epochs=epochs)
         # Evaluate model
-        iou = np.max(history.history['val_meaniou'])
+        iou = np.max(history.history["val_meaniou"])
 
         # Convert model to TFLite and measure TPU inference time
         try:
-            tflite_model, tflite_name = convert_to_tflite(keras_model=model, generation=generation, i=i, time=time)
+            tflite_model, tflite_name = convert_to_tflite(
+                keras_model=model, generation=generation, i=i, time=time
+            )
             edgetpu_name = compile_edgetpu(tflite_name)
             tpu_time = inference_time_tpu(edgetpu_model_name=edgetpu_name)
         except:
@@ -140,11 +144,11 @@ def select_models(train_ds,
         tpu_time_list.append(tpu_time)
 
         # Save fitness, IOU, and TPU time information
-        with open(fitness_list_dir, 'wb') as f:
+        with open(fitness_list_dir, "wb") as f:
             pickle.dump(fitness_list, f)
-        with open(iou_list_dir, 'wb') as f:
+        with open(iou_list_dir, "wb") as f:
             pickle.dump(iou_list, f)
-        with open(tpu_time_list_dir, 'wb') as f:
+        with open(tpu_time_list_dir, "wb") as f:
             pickle.dump(tpu_time_list, f)
 
         gc.collect()
@@ -154,11 +158,13 @@ def select_models(train_ds,
     average_fitness = np.average(fitness_list)
 
     # Select best models based on fitness
-    best_models_indices = sorted(range(len(fitness_list)), key=lambda j: fitness_list[j], reverse=True)[:5]
+    best_models_indices = sorted(
+        range(len(fitness_list)), key=lambda j: fitness_list[j], reverse=True
+    )[:5]
     best_models_arrays = [population_array[k] for k in best_models_indices]
 
     # Save architectures of the best models
-    with open(best_models_arrays_dir, 'wb') as f:
+    with open(best_models_arrays_dir, "wb") as f:
         pickle.dump(best_models_arrays, f)
 
     return best_models_arrays, max_fitness, average_fitness
@@ -207,7 +213,9 @@ def mutate(model_array, mutate_prob=0.05):
 
     # Perform mutation operation: if the randomly generated number for a position is less than mutation probability,
     # flip the bit at that position in the model array; else, keep the original bit
-    mutated_array = np.where(prob < mutate_prob, np.logical_not(model_array), model_array)
+    mutated_array = np.where(
+        prob < mutate_prob, np.logical_not(model_array), model_array
+    )
 
     return mutated_array
 
@@ -237,7 +245,9 @@ def create_next_population(parent_arrays, population=20, num_classes=5):
         # Perform crossover operation using parent arrays
         next_population_array[individual] = crossover(parent_arrays)
         # Perform mutation operation with a mutation probability of 0.03
-        next_population_array[individual] = mutate(next_population_array[individual], mutate_prob=0.03)
+        next_population_array[individual] = mutate(
+            next_population_array[individual], mutate_prob=0.03
+        )
 
     # For each individual in the population
     for individual in range(population):
@@ -250,9 +260,13 @@ def create_next_population(parent_arrays, population=20, num_classes=5):
             # Perform crossover operation using parent arrays
             next_population_array[individual] = crossover(parent_arrays)
             # Perform mutation operation with a mutation probability of 0.03
-            next_population_array[individual] = mutate(next_population_array[individual], mutate_prob=0.03)
+            next_population_array[individual] = mutate(
+                next_population_array[individual], mutate_prob=0.03
+            )
             # Create a new model using the updated individual's model array
-            model = create_model(next_population_array[individual], num_classes=num_classes)
+            model = create_model(
+                next_population_array[individual], num_classes=num_classes
+            )
         # Delete the model after checking
         del model
 
@@ -260,8 +274,17 @@ def create_next_population(parent_arrays, population=20, num_classes=5):
     return next_population_array
 
 
-def start_evolution(train_ds, val_ds, test_ds, generations, population, num_classes, epochs, population_array=None,
-                    time=None):
+def start_evolution(
+    train_ds,
+    val_ds,
+    test_ds,
+    generations,
+    population,
+    num_classes,
+    epochs,
+    population_array=None,
+    time=None,
+):
     """
     This function starts the evolutionary process to generate the optimal model architecture.
 
@@ -303,9 +326,11 @@ def start_evolution(train_ds, val_ds, test_ds, generations, population, num_clas
 
     # If no initial population is given, create the first population
     if population_array is None:
-        population_array = create_first_population(population=population, num_classes=num_classes)
+        population_array = create_first_population(
+            population=population, num_classes=num_classes
+        )
 
-    result_dir = f'results_{time}'
+    result_dir = f"results_{time}"
 
     # Create the result directory if it does not exist
     if not os.path.exists(result_dir):
@@ -313,31 +338,44 @@ def start_evolution(train_ds, val_ds, test_ds, generations, population, num_clas
 
     # Run evolution for the given number of generations
     for generation in range(generations):
-        best_models_arrays, max_fitness, average_fitness = select_models(train_ds=train_ds, val_ds=val_ds,
-                                                                         test_ds=test_ds, time=time,
-                                                                         population_array=population_array,
-                                                                         generation=generation, epochs=epochs,
-                                                                         num_classes=num_classes)
+        best_models_arrays, max_fitness, average_fitness = select_models(
+            train_ds=train_ds,
+            val_ds=val_ds,
+            test_ds=test_ds,
+            time=time,
+            population_array=population_array,
+            generation=generation,
+            epochs=epochs,
+            num_classes=num_classes,
+        )
         # Create the next population based on the best models from the current generation
-        population_array = create_next_population(parent_arrays=best_models_arrays, population=population,
-                                                  num_classes=num_classes)
+        population_array = create_next_population(
+            parent_arrays=best_models_arrays,
+            population=population,
+            num_classes=num_classes,
+        )
 
         max_fitness_history.append(max_fitness)
         average_fitness_history.append(average_fitness)
 
         # Save the next population, max fitness history, average fitness history and best models arrays
-        next_population_array_dir = result_dir + '/next_population_array.pkl'
-        max_fitness_history_dir = result_dir + '/max_fitness_history.pkl'
-        average_fitness_history_dir = result_dir + '/average_fitness_history.pkl'
-        best_model_arrays_dir = result_dir + '/best_model_arrays.pkl'
+        next_population_array_dir = result_dir + "/next_population_array.pkl"
+        max_fitness_history_dir = result_dir + "/max_fitness_history.pkl"
+        average_fitness_history_dir = result_dir + "/average_fitness_history.pkl"
+        best_model_arrays_dir = result_dir + "/best_model_arrays.pkl"
 
-        with open(next_population_array_dir, 'wb') as f:
+        with open(next_population_array_dir, "wb") as f:
             pickle.dump(population_array, f)
-        with open(max_fitness_history_dir, 'wb') as f:
+        with open(max_fitness_history_dir, "wb") as f:
             pickle.dump(max_fitness_history, f)
-        with open(average_fitness_history_dir, 'wb') as f:
+        with open(average_fitness_history_dir, "wb") as f:
             pickle.dump(average_fitness_history, f)
-        with open(best_model_arrays_dir, 'wb') as f:
+        with open(best_model_arrays_dir, "wb") as f:
             pickle.dump(best_models_arrays, f)
 
-    return population_array, max_fitness_history, average_fitness_history, best_models_arrays
+    return (
+        population_array,
+        max_fitness_history,
+        average_fitness_history,
+        best_models_arrays,
+    )

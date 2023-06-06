@@ -1,6 +1,7 @@
 # calculate the fitness
-import numpy as np
 from math import pi
+
+import numpy as np
 
 
 def calculate_fitness(iou, inference_time):
@@ -28,4 +29,3 @@ def calculate_fitness(iou, inference_time):
     fitness = (1 - np.arctan(inference_time / 200) / (pi / 2)) * iou
     print("Fitness:", fitness)
     return fitness
-

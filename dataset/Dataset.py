@@ -1,17 +1,21 @@
+import os
+
+import numpy as np
+import scipy.io
 import tensorflow as tf
 from tensorflow import keras
-import numpy as np
-
-import os
-import scipy.io
 
 # Paths to images and corresponding annotations
 path_images = "101_ObjectCategories/airplanes/"
 path_annot = "Annotations/Airplanes_Side_2/"
 
 # Get list of paths to images and annotations
-image_paths = [f for f in os.listdir(path_images) if os.path.isfile(os.path.join(path_images, f))]
-annot_paths = [f for f in os.listdir(path_annot) if os.path.isfile(os.path.join(path_annot, f))]
+image_paths = [
+    f for f in os.listdir(path_images) if os.path.isfile(os.path.join(path_images, f))
+]
+annot_paths = [
+    f for f in os.listdir(path_annot) if os.path.isfile(os.path.join(path_annot, f))
+]
 
 image_paths.sort()
 annot_paths.sort()
@@ -52,6 +56,18 @@ x_test = np.asarray(images[int(len(images) * 0.9) :])
 y_test = np.asarray(targets[int(len(targets) * 0.9) :])
 
 # Create tensorflow datasets for training, validation, and testing
-train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(32).prefetch(tf.data.AUTOTUNE)
-val_ds = tf.data.Dataset.from_tensor_slices((x_val, y_val)).batch(32).prefetch(tf.data.AUTOTUNE)
-test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32).prefetch(tf.data.AUTOTUNE)
+train_ds = (
+    tf.data.Dataset.from_tensor_slices((x_train, y_train))
+    .batch(32)
+    .prefetch(tf.data.AUTOTUNE)
+)
+val_ds = (
+    tf.data.Dataset.from_tensor_slices((x_val, y_val))
+    .batch(32)
+    .prefetch(tf.data.AUTOTUNE)
+)
+test_ds = (
+    tf.data.Dataset.from_tensor_slices((x_test, y_test))
+    .batch(32)
+    .prefetch(tf.data.AUTOTUNE)
+)
