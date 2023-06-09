@@ -5,8 +5,8 @@ import numpy as np
 
 
 def calculate_fitness(iou, inference_time):
-    """
-    This function calculates the fitness value for a model based on intersection-over-union (IoU) and inference time.
+    """This function calculates the fitness value for a model based on intersection-
+    over-union (IoU) and inference time.
 
     Parameters:
     ----------

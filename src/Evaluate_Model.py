@@ -4,8 +4,7 @@ from tqdm.notebook import tqdm
 
 
 def model_evaluation(trained_model, test_ds):
-    """
-    This function evaluates the performance of the trained model on the test dataset.
+    """This function evaluates the performance of the trained model on the test dataset.
 
     Parameters:
     ----------
@@ -25,8 +24,7 @@ def model_evaluation(trained_model, test_ds):
 
 
 def evaluate_tflite_model(tflite_model, x_test, y_test, tfl_int8=True):
-    """
-    This function evaluates the performance of a TensorFlow Lite model on a test set.
+    """This function evaluates the performance of a TensorFlow Lite model on a test set.
 
     Parameters:
     ----------

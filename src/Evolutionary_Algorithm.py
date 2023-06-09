@@ -3,7 +3,6 @@ import os
 import pickle
 
 import numpy as np
-
 from src.Compile_Edge_TPU import compile_edgetpu
 from src.Create_Model import create_model, train_model
 from src.Fitness_Function import calculate_fitness
@@ -13,8 +12,7 @@ from src.TFLITE_Converter import convert_to_tflite
 
 
 def create_first_population(population, num_classes=5):
-    """
-    Generate the initial population of models for a genetic algorithm.
+    """Generate the initial population of models for a genetic algorithm.
 
     Parameters:
     population : int
@@ -59,9 +57,8 @@ def select_models(
     epochs=30,
     num_classes=34,
 ):
-    """
-    Trains models defined by the population_array, evaluates them, selects the best models based on fitness
-    and saves the model information and fitness stats.
+    """Trains models defined by the population_array, evaluates them, selects the best
+    models based on fitness and saves the model information and fitness stats.
 
     Parameters:
     ----------
@@ -171,8 +168,8 @@ def select_models(
 
 
 def crossover(parent_arrays):
-    """
-    Performs crossover operation on a list of parent arrays to generate a child array.
+    """Performs crossover operation on a list of parent arrays to generate a child
+    array.
 
     Parameters:
     parent_arrays : list of np.ndarray
@@ -194,8 +191,7 @@ def crossover(parent_arrays):
 
 
 def mutate(model_array, mutate_prob=0.05):
-    """
-    Performs mutation operation on a given model array.
+    """Performs mutation operation on a given model array.
 
     Parameters:
     model_array : np.ndarray
@@ -221,8 +217,8 @@ def mutate(model_array, mutate_prob=0.05):
 
 
 def create_next_population(parent_arrays, population=20, num_classes=5):
-    """
-    Creates the next generation of model arrays by performing crossover and mutation operations.
+    """Creates the next generation of model arrays by performing crossover and mutation
+    operations.
 
     Parameters:
     parent_arrays : list of np.ndarray
@@ -285,8 +281,8 @@ def start_evolution(
     population_array=None,
     time=None,
 ):
-    """
-    This function starts the evolutionary process to generate the optimal model architecture.
+    """This function starts the evolutionary process to generate the optimal model
+    architecture.
 
     Parameters:
     ----------

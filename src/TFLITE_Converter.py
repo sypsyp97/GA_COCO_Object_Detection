@@ -1,5 +1,4 @@
 import tensorflow as tf
-
 from dataset.Dataset import x_test
 
 
@@ -9,9 +8,9 @@ def representative_data_gen():
 
 
 def convert_to_tflite(keras_model, generation=0, i=0, time=0):
-    """
-    Convert a TensorFlow Keras model to TensorFlow Lite format and save it to a file. This function also applies
-    optimization and quantization to the model during the conversion process.
+    """Convert a TensorFlow Keras model to TensorFlow Lite format and save it to a file.
+    This function also applies optimization and quantization to the model during the
+    conversion process.
 
     Parameters:
     keras_model : keras.Model

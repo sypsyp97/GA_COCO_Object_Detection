@@ -1,15 +1,14 @@
 import tensorflow as tf
 import tensorflow_addons as tfa
 from keras import layers
-from tensorflow import keras
-
 from src.Decode_Block import decoded_block
 from src.Gene_Pool import conv_block
+from tensorflow import keras
 
 
 def create_model(model_array, input_shape=(256, 256, 3), num_classes=4):
-    """
-    This function constructs a Keras model based on a given array encoding the structure of the model.
+    """This function constructs a Keras model based on a given array encoding the
+    structure of the model.
 
     Parameters:
     ----------
@@ -43,15 +42,14 @@ def create_model(model_array, input_shape=(256, 256, 3), num_classes=4):
 
 
 class meaniou(tf.keras.metrics.Metric):
-    """
-    This class is an implementation of a custom metric called mean intersection-over-union (mean IoU).
+    """This class is an implementation of a custom metric called mean intersection-over-
+    union (mean IoU).
 
     Intersection-over-union (IoU) is a common evaluation metric for object detection tasks. This class calculates
     mean IoU for batch of predictions and ground truth bounding boxes.
 
     The metric is updated using `update_state` method, and `result` method computes mean IoU. `reset_states` resets
     the internal variables for the next computation.
-
     """
 
     def __init__(self, name="meaniou", **kwargs):
@@ -91,8 +89,8 @@ class meaniou(tf.keras.metrics.Metric):
 
 
 def model_summary(model):
-    """
-    This function prints the summary of the Keras model along with the total number of trainable weights.
+    """This function prints the summary of the Keras model along with the total number
+    of trainable weights.
 
     Parameters:
     ----------
@@ -110,9 +108,8 @@ def model_summary(model):
 def train_model(
     train_ds, val_ds, model, epochs=100, checkpoint_filepath="checkpoints/checkpoint"
 ):
-    """
-    This function trains the Keras model on the given datasets and saves the weights of the best performing model
-    using the validation dataset.
+    """This function trains the Keras model on the given datasets and saves the weights
+    of the best performing model using the validation dataset.
 
     Parameters:
     ----------
